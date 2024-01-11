@@ -1,0 +1,21 @@
+name = "conversation"
+version = "1.0.0"
+target = "javascript"
+
+description = "Gleam bindings for the standard JavaScript Request and Response APIs"
+licences = ["MIT"]
+repository = { type = "github", user = "MystPi", repo = "conversation" }
+# links = [{ title = "Website", href = "https://gleam.run" }]
+
+[javascript]
+runtime = "deno"
+
+[javascript.deno]
+allow_all = true
+
+[dependencies]
+gleam_stdlib = "~> 0.32"
+gleam_http = "~> 3.5"
+gleam_javascript = "~> 0.7"
+
+[dev-dependencies]
