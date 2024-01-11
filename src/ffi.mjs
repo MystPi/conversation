@@ -39,16 +39,30 @@ export function translateResponse(res) {
   });
 }
 
-export function readText(body) {
-  return body.text();
+export async function readText(body) {
+  try {
+    return new $gleam.Ok(await body.text());
+  } catch (e) {
+    return new $gleam.Error();
+  }
 }
 
 export async function readBits(body) {
-  return new $gleam.BitArray(new Uint8Array(await body.arrayBuffer()));
+  try {
+    return new $gleam.Ok(
+      new $gleam.BitArray(new Uint8Array(await body.arrayBuffer()))
+    );
+  } catch (e) {
+    return new $gleam.Error();
+  }
 }
 
-export function readJson(body) {
-  return body.json();
+export async function readJson(body) {
+  try {
+    return new $gleam.Ok(await body.json());
+  } catch (e) {
+    return new $gleam.Error();
+  }
 }
 
 function maybe(x) {

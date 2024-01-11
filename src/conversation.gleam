@@ -39,14 +39,14 @@ pub fn translate_response(res: Response(ResponseBody)) -> JsResponse
 
 /// Read a request body as text.
 @external(javascript, "./ffi.mjs", "readText")
-pub fn read_text(body: RequestBody) -> Promise(String)
+pub fn read_text(body: RequestBody) -> Promise(Result(String, Nil))
 
 /// Read a request body as a BitArray.
 @external(javascript, "./ffi.mjs", "readBits")
-pub fn read_bits(body: RequestBody) -> Promise(BitArray)
+pub fn read_bits(body: RequestBody) -> Promise(Result(BitArray, Nil))
 
 /// Read a request body as JSON, returning a
 /// [`Dynamic`](https://hexdocs.pm/gleam_stdlib/gleam/dynamic.html#Dynamic) value
 /// which can then be decoded with [`gleam_json`](https://hexdocs.pm/gleam_json/).
 @external(javascript, "./ffi.mjs", "readJson")
-pub fn read_json(body: RequestBody) -> Promise(Dynamic)
+pub fn read_json(body: RequestBody) -> Promise(Result(Dynamic, Nil))
