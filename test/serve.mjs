@@ -1,3 +1,1 @@
-export function serve(handler) {
-  Deno.serve((req) => handler(req));
-}
+export const serve = Deno.serve;
