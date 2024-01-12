@@ -17,6 +17,28 @@ pub fn main() {
   serve(handler)
 }
 
+/// This is the server wrapper, where all the magic happens.
+fn serve(handler: fn(Request) -> Response) -> Nil {
+  deno_serve(fn(req) {
+    // Translate the JsRequest into a Gleam Request
+    translate_request(req)
+    // Pass it to the handler, which returns a Gleam Response
+    |> handler
+    // Translate the response into a JsResponse, which in turn will get sent to
+    // the client
+    |> promise.map(translate_response)
+  })
+}
+
+/// ./serve.mjs is only a single line:
+///
+///     export const serve = Deno.serve;
+///
+/// Since `conversation` handles type conversions for us, very little external
+/// JavaScript needs to be written.
+@external(javascript, "./serve.mjs", "serve")
+fn deno_serve(handler: fn(JsRequest) -> Promise(JsResponse)) -> Nil
+
 fn handler(req: Request) -> Response {
   case req.method {
     http.Get -> show_form()
@@ -75,28 +97,3 @@ fn html_resp(status: Int, html: String) -> Response {
   |> response.set_header("content-type", "text/html")
   |> promise.resolve
 }
-
-/// This is the server wrapper, where all the magic happens. On every request we:
-/// (1) Translate the JsRequest into a Gleam Request
-/// (2) Pass it to the handler, which returns a Gleam Response
-/// (3) Translate the response into a JsResponse, which in turn will get sent to
-/// the client
-fn serve(handler: fn(Request) -> Response) -> Nil {
-  deno_serve(fn(req) {
-    // (1)
-    translate_request(req)
-    // (2)
-    |> handler
-    // (3)
-    |> promise.map(translate_response)
-  })
-}
-
-/// ./serve.mjs is only a single line:
-///
-///     export const serve = Deno.serve;
-///
-/// Since `conversation` handles type conversions for us, very little external
-/// JavaScript needs to be written.
-@external(javascript, "./serve.mjs", "serve")
-fn deno_serve(handler: fn(JsRequest) -> Promise(JsResponse)) -> Nil
