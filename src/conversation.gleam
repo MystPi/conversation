@@ -27,6 +27,29 @@ pub type ResponseBody {
   Bits(BitArray)
 }
 
+/// Data parsed from form sent in a request's body.
+pub type FormData {
+  FormData(
+    /// String values of the form's fields, sorted alphabetically.
+    values: List(#(String, String)),
+    /// Uploaded files, sorted alphabetically by file name.
+    files: List(#(String, UploadedFile)),
+  )
+}
+
+/// File uploaded from the client.
+pub type UploadedFile {
+  UploadedFile(
+    /// The name that was given to the file in the form.
+    /// This is user input and should not be trusted.
+    file_name: String,
+    /// The location of the file on the server.
+    /// This is a temporary file and will be deleted when the request has
+    /// finished being handled.
+    path: String,
+  )
+}
+
 /// Translates a [`JsRequest`](#JsRequest) into a Gleam
 /// [`Request`](https://hexdocs.pm/gleam_http/gleam/http/request.html#Request).
 @external(javascript, "./ffi.mjs", "translateRequest")
@@ -50,3 +73,7 @@ pub fn read_bits(body: RequestBody) -> Promise(Result(BitArray, Nil))
 /// which can then be decoded with [`gleam_json`](https://hexdocs.pm/gleam_json/).
 @external(javascript, "./ffi.mjs", "readJson")
 pub fn read_json(body: RequestBody) -> Promise(Result(Dynamic, Nil))
+
+/// Read a request body as [`FormData`](#FormData).
+@external(javascript, "./ffi.mjs", "readForm")
+pub fn read_form(body: RequestBody) -> Promise(Result(FormData, Nil))

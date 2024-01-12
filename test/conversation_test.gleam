@@ -1,30 +1,102 @@
-import gleam/http/request.{type Request}
-import gleam/http/response.{type Response}
+import gleam/http
+import gleam/http/request.{type Request as HttpRequest}
+import gleam/http/response.{type Response as HttpResponse}
 import gleam/javascript/promise.{type Promise}
 import conversation.{
   type JsRequest, type JsResponse, type RequestBody, type ResponseBody, Text,
   translate_request, translate_response,
 }
 
-pub fn main() {
-  serve(fn(req) {
-    let body = "Hello at " <> req.path <> "!"
+type Response =
+  Promise(HttpResponse(ResponseBody))
 
-    response.new(200)
-    |> response.set_body(Text(body))
-    |> promise.resolve
-  })
+type Request =
+  HttpRequest(RequestBody)
+
+pub fn main() {
+  serve(handler)
 }
 
-fn serve(
-  handler: fn(Request(RequestBody)) -> Promise(Response(ResponseBody)),
-) -> Nil {
+fn handler(req: Request) -> Response {
+  case req.method {
+    http.Get -> show_form()
+    http.Post -> handle_form_submission(req)
+    _ -> text_resp(405, "Method not allowed")
+  }
+}
+
+fn show_form() -> Response {
+  let html =
+    "<form method='post'>
+      <label>Title:
+        <input type='text' name='title'>
+      </label>
+      <label>Name:
+        <input type='text' name='name'>
+      </label>
+      <input type='submit' value='Submit'>
+    </form>"
+
+  html_resp(200, html)
+}
+
+fn handle_form_submission(req: Request) -> Response {
+  use formdata <- promise.await(conversation.read_form(req.body))
+
+  case formdata {
+    Ok(formdata) -> {
+      let greeting = case formdata.values {
+        // Since FormData values are sorted alphabetically, we can safely pattern
+        // match on them. Here we have gotten both a name and title.
+        [#("name", name), #("title", title)] -> {
+          // Remember to always do HTML escaping in real applications. Never trust
+          // the client!
+          "Hi, " <> title <> " " <> name <> "!"
+        }
+        // Since required data is missing, we give a generic greeting.
+        _ -> "Hi there!"
+      }
+
+      html_resp(200, greeting)
+    }
+    Error(_) -> text_resp(400, "Bad request")
+  }
+}
+
+fn text_resp(status: Int, text: String) -> Response {
+  response.new(status)
+  |> response.set_body(Text(text))
+  |> promise.resolve
+}
+
+fn html_resp(status: Int, html: String) -> Response {
+  response.new(status)
+  |> response.set_body(Text(html))
+  |> response.set_header("content-type", "text/html")
+  |> promise.resolve
+}
+
+/// This is the server wrapper, where all the magic happens. On every request we:
+/// (1) Translate the JsRequest into a Gleam Request
+/// (2) Pass it to the handler, which returns a Gleam Response
+/// (3) Translate the response into a JsResponse, which in turn will get sent to
+/// the client
+fn serve(handler: fn(Request) -> Response) -> Nil {
   deno_serve(fn(req) {
+    // (1)
     translate_request(req)
+    // (2)
     |> handler
+    // (3)
     |> promise.map(translate_response)
   })
 }
 
+/// ./serve.mjs is only a single line:
+///
+///     export const serve = Deno.serve;
+///
+/// Since `conversation` handles type conversions for us, very little external
+/// JavaScript needs to be written.
 @external(javascript, "./serve.mjs", "serve")
 fn deno_serve(handler: fn(JsRequest) -> Promise(JsResponse)) -> Nil

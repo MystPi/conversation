@@ -65,6 +65,46 @@ export async function readJson(body) {
   }
 }
 
+export async function readForm(body) {
+  try {
+    const formData = await body.formData();
+    const values = [];
+    const files = [];
+
+    for (const [key, value] of formData) {
+      if (value instanceof File) {
+        files.push([
+          key,
+          new $conversation.UploadedFile(value.name, value.webkitRelativePath),
+        ]);
+      } else {
+        values.push([key, value]);
+      }
+    }
+
+    return new $gleam.Ok(
+      new $conversation.FormData(
+        $gleam.List.fromArray(sortTuples(values)),
+        $gleam.List.fromArray(sortTuples(files))
+      )
+    );
+  } catch (e) {
+    return new $gleam.Error();
+  }
+}
+
+function sortTuples(x) {
+  return x.sort((a, b) => {
+    if (a[0] < b[0]) {
+      return -1;
+    }
+    if (a[0] > b[0]) {
+      return 1;
+    }
+    return 0;
+  });
+}
+
 function maybe(x) {
   if (x) {
     return new $option.Some(x);
