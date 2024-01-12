@@ -50,6 +50,16 @@ pub type UploadedFile {
   )
 }
 
+/// Error type representing possible errors produced by body reading functions.
+pub type ReadError {
+  /// Request body has already been read.
+  AlreadyRead
+  /// Failed to parse JSON body.
+  ParseError(message: String)
+  /// Failed to read request body.
+  ReadError(message: String)
+}
+
 /// Translates a [`JsRequest`](#JsRequest) into a Gleam
 /// [`Request`](https://hexdocs.pm/gleam_http/gleam/http/request.html#Request).
 @external(javascript, "./ffi.mjs", "translateRequest")
@@ -62,18 +72,19 @@ pub fn translate_response(res: Response(ResponseBody)) -> JsResponse
 
 /// Read a request body as text.
 @external(javascript, "./ffi.mjs", "readText")
-pub fn read_text(body: RequestBody) -> Promise(Result(String, Nil))
+pub fn read_text(body: RequestBody) -> Promise(Result(String, ReadError))
 
 /// Read a request body as a BitArray.
 @external(javascript, "./ffi.mjs", "readBits")
-pub fn read_bits(body: RequestBody) -> Promise(Result(BitArray, Nil))
+pub fn read_bits(body: RequestBody) -> Promise(Result(BitArray, ReadError))
 
 /// Read a request body as JSON, returning a
 /// [`Dynamic`](https://hexdocs.pm/gleam_stdlib/gleam/dynamic.html#Dynamic) value
 /// which can then be decoded with [`gleam_json`](https://hexdocs.pm/gleam_json/).
+/// If the JSON cannot be parsed, a [`ParseError`](#ReadError) is returned.
 @external(javascript, "./ffi.mjs", "readJson")
-pub fn read_json(body: RequestBody) -> Promise(Result(Dynamic, Nil))
+pub fn read_json(body: RequestBody) -> Promise(Result(Dynamic, ReadError))
 
 /// Read a request body as [`FormData`](#FormData).
 @external(javascript, "./ffi.mjs", "readForm")
-pub fn read_form(body: RequestBody) -> Promise(Result(FormData, Nil))
+pub fn read_form(body: RequestBody) -> Promise(Result(FormData, ReadError))

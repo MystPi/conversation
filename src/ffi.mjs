@@ -39,34 +39,22 @@ export function translateResponse(res) {
   });
 }
 
-export async function readText(body) {
-  try {
-    return new $gleam.Ok(await body.text());
-  } catch (e) {
-    return new $gleam.Error();
-  }
+export function readText(body) {
+  return handleErrors(() => body.text());
 }
 
-export async function readBits(body) {
-  try {
-    return new $gleam.Ok(
-      new $gleam.BitArray(new Uint8Array(await body.arrayBuffer()))
-    );
-  } catch (e) {
-    return new $gleam.Error();
-  }
+export function readBits(body) {
+  return handleErrors(
+    async () => new $gleam.BitArray(new Uint8Array(await body.arrayBuffer()))
+  );
 }
 
-export async function readJson(body) {
-  try {
-    return new $gleam.Ok(await body.json());
-  } catch (e) {
-    return new $gleam.Error();
-  }
+export function readJson(body) {
+  return handleErrors(() => body.json());
 }
 
-export async function readForm(body) {
-  try {
+export function readForm(body) {
+  return handleErrors(async () => {
     const formData = await body.formData();
     const values = [];
     const files = [];
@@ -82,14 +70,28 @@ export async function readForm(body) {
       }
     }
 
-    return new $gleam.Ok(
-      new $conversation.FormData(
-        $gleam.List.fromArray(sortTuples(values)),
-        $gleam.List.fromArray(sortTuples(files))
-      )
+    return new $conversation.FormData(
+      $gleam.List.fromArray(sortTuples(values)),
+      $gleam.List.fromArray(sortTuples(files))
     );
+  });
+}
+
+async function handleErrors(cb) {
+  try {
+    return new $gleam.Ok(await cb());
   } catch (e) {
-    return new $gleam.Error();
+    let error;
+
+    if (e instanceof TypeError && e.message === 'Body already consumed.') {
+      error = new $conversation.AlreadyRead();
+    } else if (e instanceof SyntaxError) {
+      error = new $conversation.ParseError(e.message);
+    } else {
+      error = new $conversation.ReadError(e.message);
+    }
+
+    return new $gleam.Error(error);
   }
 }
 
