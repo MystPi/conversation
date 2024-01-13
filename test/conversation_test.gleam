@@ -43,23 +43,21 @@ fn handler(req: Request) -> Response {
   case req.method {
     http.Get -> show_form()
     http.Post -> handle_form_submission(req)
-    _ -> text_resp(405, "Method not allowed")
+    _ -> text_resp("Method not allowed", 405)
   }
 }
 
 fn show_form() -> Response {
-  let html =
-    "<form method='post'>
-      <label>Title:
-        <input type='text' name='title'>
-      </label>
-      <label>Name:
-        <input type='text' name='name'>
-      </label>
-      <input type='submit' value='Submit'>
-    </form>"
-
-  html_resp(200, html)
+  "<form method='post'>
+    <label>Title:
+      <input type='text' name='title'>
+    </label>
+    <label>Name:
+      <input type='text' name='name'>
+    </label>
+    <input type='submit' value='Submit'>
+  </form>"
+  |> html_resp(200)
 }
 
 fn handle_form_submission(req: Request) -> Response {
@@ -67,7 +65,7 @@ fn handle_form_submission(req: Request) -> Response {
 
   case formdata {
     Ok(formdata) -> {
-      let greeting = case formdata.values {
+      case formdata.values {
         // Since FormData values are sorted alphabetically, we can safely pattern
         // match on them. Here we have gotten both a name and title.
         [#("name", name), #("title", title)] -> {
@@ -78,20 +76,19 @@ fn handle_form_submission(req: Request) -> Response {
         // Since required data is missing, we give a generic greeting.
         _ -> "Hi there!"
       }
-
-      html_resp(200, greeting)
+      |> html_resp(200)
     }
-    Error(_) -> text_resp(400, "Bad request")
+    Error(_) -> text_resp("Bad request", 400)
   }
 }
 
-fn text_resp(status: Int, text: String) -> Response {
+fn text_resp(text: String, status: Int) -> Response {
   response.new(status)
   |> response.set_body(Text(text))
   |> promise.resolve
 }
 
-fn html_resp(status: Int, html: String) -> Response {
+fn html_resp(html: String, status: Int) -> Response {
   response.new(status)
   |> response.set_body(Text(html))
   |> response.set_header("content-type", "text/html")
