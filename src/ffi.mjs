@@ -31,9 +31,11 @@ export function translateRequest(req) {
 
 export function translateResponse(res) {
   const body =
-    res.body instanceof $conversation.Bits ? res.body[0].buffer : res.body[0];
+    res.body instanceof $conversation.Bits
+      ? new Blob([res.body[0].buffer])
+      : res.body[0];
 
-  return new Response(new Blob([body]), {
+  return new Response(body, {
     status: res.status,
     headers: res.headers,
   });

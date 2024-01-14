@@ -9,6 +9,9 @@ pub type JsRequest
 /// A standard JavaScript [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response).
 pub type JsResponse
 
+/// A JavaScript [`ReadableStream`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream).
+pub type JsReadableStream
+
 /// The body of an incoming request. It must be read with functions like
 /// [`read_text`](#read_text), and can only be read once.
 pub type RequestBody
@@ -23,8 +26,14 @@ pub type RequestBody
 /// |> response.set_body(Text("Hello, world!"))
 /// ```
 pub type ResponseBody {
+  /// A text body.
   Text(String)
+  /// A BitArray body.
   Bits(BitArray)
+  /// A [`JsReadableStream`](#JsReadableStream) body. This is useful for sending
+  /// files without reading them into memory. (For example: using the
+  /// `Deno.openSync(path).readable` API.)
+  Stream(JsReadableStream)
 }
 
 /// Data parsed from form sent in a request's body.
