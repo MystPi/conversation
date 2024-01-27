@@ -46,16 +46,14 @@ pub type FormData {
   )
 }
 
-/// File uploaded from the client.
+// TODO: support reading file contents
+/// File uploaded from the client. Conversation does not currently support reading
+/// the file's contents.
 pub type UploadedFile {
   UploadedFile(
     /// The name that was given to the file in the form.
     /// This is user input and should not be trusted.
     file_name: String,
-    /// The location of the file on the server.
-    /// This is a temporary file and will be deleted when the request has
-    /// finished being handled.
-    path: String,
   )
 }
 

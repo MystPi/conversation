@@ -63,10 +63,7 @@ export function readForm(body) {
 
     for (const [key, value] of formData) {
       if (value instanceof File) {
-        files.push([
-          key,
-          new $conversation.UploadedFile(value.name, value.webkitRelativePath),
-        ]);
+        files.push([key, new $conversation.UploadedFile(value.name)]);
       } else {
         values.push([key, value]);
       }
