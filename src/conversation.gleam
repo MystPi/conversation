@@ -94,6 +94,7 @@ pub fn read_bits(body: RequestBody) -> Promise(Result(BitArray, ReadError))
 @external(javascript, "./ffi.mjs", "readJson")
 pub fn read_json(body: RequestBody) -> Promise(Result(Dynamic, ReadError))
 
-/// Read a request body as [`FormData`](#FormData).
+/// Read a request body as [`FormData`](#FormData). If the formdata cannot be
+/// parsed, a [`ParseError`](#ReadError) is returned.
 @external(javascript, "./ffi.mjs", "readForm")
 pub fn read_form(body: RequestBody) -> Promise(Result(FormData, ReadError))

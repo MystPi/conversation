@@ -87,7 +87,7 @@ async function handleErrors(cb) {
 
     if (e instanceof TypeError && e.message === 'Body already consumed.') {
       error = new $conversation.AlreadyRead();
-    } else if (e instanceof SyntaxError) {
+    } else if (e instanceof SyntaxError || e instanceof TypeError) {
       error = new $conversation.ParseError(e.message);
     } else {
       error = new $conversation.ReadError(e.message);
