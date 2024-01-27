@@ -63,7 +63,7 @@ pub type UploadedFile {
 pub type ReadError {
   /// Request body has already been read.
   AlreadyRead
-  /// Failed to parse JSON body.
+  /// Failed to parse JSON or form body.
   ParseError(message: String)
   /// Failed to read request body.
   ReadError(message: String)
