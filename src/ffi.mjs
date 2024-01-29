@@ -42,21 +42,22 @@ export function translateResponse(res) {
 }
 
 export function readText(body) {
-  return handleErrors(() => body.text());
+  return safeRead(body, () => body.text());
 }
 
 export function readBits(body) {
-  return handleErrors(
+  return safeRead(
+    body,
     async () => new $gleam.BitArray(new Uint8Array(await body.arrayBuffer()))
   );
 }
 
 export function readJson(body) {
-  return handleErrors(() => body.json());
+  return safeRead(body, () => body.json());
 }
 
 export function readForm(body) {
-  return handleErrors(async () => {
+  return safeRead(body, async () => {
     const formData = await body.formData();
     const values = [];
     const files = [];
@@ -76,15 +77,21 @@ export function readForm(body) {
   });
 }
 
-async function handleErrors(cb) {
+async function safeRead(body, cb) {
+  // If the body has already been read, return an AlreadyRead error
+  if (body.bodyUsed) return new $gleam.Error(new $conversation.AlreadyRead());
+
   try {
     return new $gleam.Ok(await cb());
   } catch (e) {
     let error;
 
-    if (e instanceof TypeError && e.message === 'Body already consumed.') {
-      error = new $conversation.AlreadyRead();
-    } else if (e instanceof SyntaxError || e instanceof TypeError) {
+    // .json() throws a SyntaxError when parsing invalid JSON
+    // .formData() throws a TypeError when the form data is invalid
+    // From the spec, these seem to be the only two exceptions we need to handle.
+    // (https://fetch.spec.whatwg.org/#dom-body-arraybuffer)
+    // Any other exception is a generic ReadError
+    if (e instanceof SyntaxError || e instanceof TypeError) {
       error = new $conversation.ParseError(e.message);
     } else {
       error = new $conversation.ReadError(e.message);
