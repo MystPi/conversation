@@ -8,7 +8,7 @@ export function translateRequest(req) {
   const url = new URL(req.url);
 
   const method = $http.parse_method(req.method)[0];
-  const headers = $gleam.List.fromArray([...req.headers]);
+  const headers = $gleam.toList([...req.headers]);
   const body = req;
   const scheme =
     url.protocol === 'https:' ? new $http.Https() : new $http.Http();
@@ -71,8 +71,8 @@ export function readForm(body) {
     }
 
     return new $conversation.FormData(
-      $gleam.List.fromArray(sortTuples(values)),
-      $gleam.List.fromArray(sortTuples(files))
+      $gleam.toList(sortTuples(values)),
+      $gleam.toList(sortTuples(files))
     );
   });
 }
