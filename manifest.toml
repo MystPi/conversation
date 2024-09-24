@@ -2,9 +2,9 @@
 # You typically do not need to edit this file
 
 packages = [
-  { name = "gleam_http", version = "3.5.3", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_http", source = "hex", outer_checksum = "C2FC3322203B16F897C1818D9810F5DEFCE347F0751F3B44421E1261277A7373" },
-  { name = "gleam_javascript", version = "0.7.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_javascript", source = "hex", outer_checksum = "B5E05F479C52217C02BA2E8FC650A716BFB62D4F8D20A90909C908598E12FBE0" },
-  { name = "gleam_stdlib", version = "0.34.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "1FB8454D2991E9B4C0C804544D8A9AD0F6184725E20D63C3155F0AEB4230B016" },
+  { name = "gleam_http", version = "3.7.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_http", source = "hex", outer_checksum = "EA66440C2269F7CED0F6845E5BD0DB68095775D627FA709A841CA78A398D6D56" },
+  { name = "gleam_javascript", version = "0.12.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_javascript", source = "hex", outer_checksum = "6EB652538B31E852FE0A8307A8B6314DEB34930944B6DDC41CCC31CA344DA35D" },
+  { name = "gleam_stdlib", version = "0.40.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "86606B75A600BBD05E539EB59FABC6E307EEEA7B1E5865AFB6D980A93BCB2181" },
 ]
 
 [requirements]
