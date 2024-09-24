@@ -3,8 +3,9 @@ import * as $http from '../gleam_http/gleam/http.mjs';
 import * as $request from '../gleam_http/gleam/http/request.mjs';
 import * as $option from '../gleam_stdlib/gleam/option.mjs';
 import * as $conversation from './conversation.mjs';
+import * as $uri from '../gleam_stdlib/gleam/uri.mjs';
 
-export function translateRequest(req) {
+export function toGleamRequest(req) {
   const url = new URL(req.url);
 
   const method = $http.parse_method(req.method)[0];
@@ -29,7 +30,15 @@ export function translateRequest(req) {
   );
 }
 
-export function translateResponse(res) {
+export function toJsRequest(req) {
+  return new Request($uri.to_string($request.to_uri(req)), {
+    method: $http.method_to_string(req.method),
+    headers: req.headers.toArray(),
+    body: req.body.body,
+  });
+}
+
+export function toJsResponse(res) {
   const body =
     res.body instanceof $conversation.Bits
       ? new Blob([res.body[0].buffer])
@@ -37,7 +46,7 @@ export function translateResponse(res) {
 
   return new Response(body, {
     status: res.status,
-    headers: res.headers,
+    headers: res.headers.toArray(),
   });
 }
 

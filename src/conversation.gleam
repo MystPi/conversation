@@ -1,7 +1,7 @@
+import gleam/dynamic.{type Dynamic}
 import gleam/http/request.{type Request}
 import gleam/http/response.{type Response}
 import gleam/javascript/promise.{type Promise}
-import gleam/dynamic.{type Dynamic}
 
 /// A standard JavaScript [`Request`](https://developer.mozilla.org/en-US/docs/Web/API/Request).
 pub type JsRequest
@@ -67,15 +67,20 @@ pub type ReadError {
   ReadError(message: String)
 }
 
-/// Translates a [`JsRequest`](#JsRequest) into a Gleam
+/// Convert a [`JsRequest`](#JsRequest) into a Gleam
 /// [`Request`](https://hexdocs.pm/gleam_http/gleam/http/request.html#Request).
-@external(javascript, "./ffi.mjs", "translateRequest")
-pub fn translate_request(req: JsRequest) -> Request(RequestBody)
+@external(javascript, "./ffi.mjs", "toGleamRequest")
+pub fn to_gleam_request(req: JsRequest) -> Request(RequestBody)
 
-/// Translates a Gleam [`Response`](https://hexdocs.pm/gleam_http/gleam/http/response.html#Response)
+/// Convert a Gleam [`Request`](https://hexdocs.pm/gleam_http/gleam/http/request.html#Request)
+/// into a [`JsRequest`](#JsRequest).
+@external(javascript, "./ffi.mjs", "toJsRequest")
+pub fn to_js_request(req: Request(RequestBody)) -> JsRequest
+
+/// Convert a Gleam [`Response`](https://hexdocs.pm/gleam_http/gleam/http/response.html#Response)
 /// into a [`JsResponse`](#JsResponse).
-@external(javascript, "./ffi.mjs", "translateResponse")
-pub fn translate_response(res: Response(ResponseBody)) -> JsResponse
+@external(javascript, "./ffi.mjs", "toJsResponse")
+pub fn to_js_response(res: Response(ResponseBody)) -> JsResponse
 
 /// Read a request body as text.
 @external(javascript, "./ffi.mjs", "readText")

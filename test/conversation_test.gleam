@@ -1,11 +1,10 @@
+import conversation.{
+  type JsRequest, type JsResponse, type RequestBody, type ResponseBody, Text,
+}
 import gleam/http
 import gleam/http/request.{type Request as HttpRequest}
 import gleam/http/response.{type Response as HttpResponse}
 import gleam/javascript/promise.{type Promise}
-import conversation.{
-  type JsRequest, type JsResponse, type RequestBody, type ResponseBody, Text,
-  translate_request, translate_response,
-}
 
 type Response =
   Promise(HttpResponse(ResponseBody))
@@ -20,13 +19,13 @@ pub fn main() {
 /// This is the server wrapper, where all the magic happens.
 fn serve(handler: fn(Request) -> Response) -> Nil {
   deno_serve(fn(req) {
-    // Translate the JsRequest into a Gleam Request
-    translate_request(req)
+    // Convert the JsRequest into a Gleam Request
+    conversation.to_gleam_request(req)
     // Pass it to the handler, which returns a Gleam Response
     |> handler
-    // Translate the response into a JsResponse, which in turn will get sent to
+    // Convert the response into a JsResponse, which in turn will get sent to
     // the client
-    |> promise.map(translate_response)
+    |> promise.map(conversation.to_js_response)
   })
 }
 
