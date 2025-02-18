@@ -3,11 +3,11 @@
 
 packages = [
   { name = "gleam_http", version = "3.7.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_http", source = "hex", outer_checksum = "EA66440C2269F7CED0F6845E5BD0DB68095775D627FA709A841CA78A398D6D56" },
-  { name = "gleam_javascript", version = "0.12.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_javascript", source = "hex", outer_checksum = "6EB652538B31E852FE0A8307A8B6314DEB34930944B6DDC41CCC31CA344DA35D" },
+  { name = "gleam_javascript", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_javascript", source = "hex", outer_checksum = "EF6C77A506F026C6FB37941889477CD5E4234FCD4337FF0E9384E297CB8F97EB" },
   { name = "gleam_stdlib", version = "0.40.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "86606B75A600BBD05E539EB59FABC6E307EEEA7B1E5865AFB6D980A93BCB2181" },
 ]
 
 [requirements]
 gleam_http = { version = "~> 3.5" }
-gleam_javascript = { version = "~> 0.7" }
+gleam_javascript = { version = ">= 0.7.0 and < 2.0.0" }
 gleam_stdlib = { version = "~> 0.32" }
