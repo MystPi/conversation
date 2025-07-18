@@ -41,7 +41,7 @@ export function toJsRequest(req) {
 export function toJsResponse(res) {
   const body =
     res.body instanceof $conversation.Bits
-      ? new Blob([res.body[0].buffer])
+      ? new Blob([res.body[0].rawBuffer])
       : res.body[0];
 
   return new Response(body, {
